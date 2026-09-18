@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Northstar Market — Online Shopping</title>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+:root{
+ --bg:#f5f6f8;--surface:#fff;--text:#1d2026;--muted:#6d7480;--border:#e1e4e9;
+ --primary:#2457d6;--primary-dark:#1742ac;--accent:#ffb300;--success:#178457;
+ --danger:#c93c4b;--shadow:0 2px 10px rgba(20,25,35,.08);--radius:10px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;min-width:320px}
+button,input,select{font:inherit}
+button{cursor:pointer}
+img{display:block;max-width:100%}
+.hidden{display:none!important}
+
+/* Header */
+.header{height:68px;background:#172b4d;color:#fff;display:flex;align-items:center;padding:0 28px;gap:25px;position:sticky;top:0;z-index:1000}
+.brand{font-size:22px;font-weight:800;letter-spacing:-.5px;white-space:nowrap}
+.brand small{display:block;color:#9fb5d8;font-size:9px;letter-spacing:1.4px;margin-top:2px}
+.header-search{height:42px;display:flex;flex:1;max-width:700px;background:#fff;border-radius:6px;overflow:hidden}
+.header-search input{flex:1;border:0;padding:0 14px;color:#222;outline:0;min-width:0}
+.header-search button{width:48px;border:0;background:#eef2f8;color:#172b4d}
+.header-actions{display:flex;align-items:center;gap:6px;margin-left:auto}
+.header-btn{border:0;background:transparent;color:#fff;height:42px;padding:0 10px;border-radius:6px;display:flex;align-items:center;gap:7px;font-size:12px;white-space:nowrap}
+.header-btn:hover{background:rgba(255,255,255,.1)}
+.cart-wrap{position:relative}
+.count{position:absolute;top:-2px;right:1px;background:var(--accent);color:#172b4d;border-radius:50%;min-width:17px;height:17px;padding:0 4px;display:grid;place-items:center;font-size:9px;font-weight:800}
+
+/* Layout */
+.shell{max-width:1440px;margin:auto;padding:18px 22px}
+.category-strip{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;display:flex;justify-content:space-around;gap:10px;overflow:auto;box-shadow:var(--shadow)}
+.category{min-width:105px;text-align:center;border:0;background:transparent;color:var(--text);font-size:11px;font-weight:700;padding:4px}
+.category .cat-icon{width:46px;height:46px;border-radius:50%;background:#edf2ff;color:var(--primary);display:grid;place-items:center;margin:0 auto 7px}
+.category:hover{color:var(--primary)}
+.banner{margin-top:18px;background:linear-gradient(100deg,#17315d,#2457d6 55%,#4d79df);color:#fff;border-radius:12px;min-height:250px;padding:36px 45px;display:flex;align-items:center;position:relative;overflow:hidden}
+.banner:after{content:"";position:absolute;width:360px;height:360px;border-radius:50%;border:80px solid rgba(255,255,255,.07);right:-120px;top:-140px}
+.banner-content{max-width:610px;position:relative;z-index:1}.banner h1{font-size:34px;margin:0 0 9px}.banner p{font-size:14px;line-height:1.6;opacity:.88;margin:0 0 18px}
+.btn{border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:7px;padding:10px 15px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:7px}
+.btn:hover{background:#f0f2f5}.btn-primary{background:var(--primary);border-color:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-dark)}
+.btn-dark{background:#172b4d;border-color:#172b4d;color:#fff}
+.section-head{display:flex;align-items:end;justify-content:space-between;margin:25px 0 12px}.section-head h2{font-size:20px;margin:0}.section-head p{margin:4px 0 0;color:var(--muted);font-size:12px}
+
+/* Products */
+.product-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
+.product{background:var(--surface);border:1px solid var(--border);border-radius:9px;overflow:hidden;position:relative;transition:.18s}
+.product:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.product-img{height:205px;background:#f0f2f5;overflow:hidden;display:grid;place-items:center}
+.product-img img{width:100%;height:100%;object-fit:cover}
+.wish{position:absolute;right:9px;top:9px;width:34px;height:34px;border:0;border-radius:50%;background:rgba(255,255,255,.95);display:grid;place-items:center;color:#343943}
+.product-body{padding:13px}.brand-name{font-size:9px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.5px}.product-title{font-size:13px;font-weight:700;line-height:1.35;margin:5px 0 7px;min-height:35px}.stars{font-size:10px}.stars b{background:#198754;color:#fff;border-radius:4px;padding:3px 5px}.reviews{color:var(--muted);margin-left:5px}.price{font-size:17px;font-weight:800;margin-top:9px}.old-price{text-decoration:line-through;color:var(--muted);font-size:10px;margin-left:5px}.discount{color:var(--success);font-size:10px;font-weight:800;margin-left:4px}.stock{font-size:10px;color:var(--success);margin-top:6px}.product-actions{display:flex;gap:6px;margin-top:11px}.product-actions .btn{flex:1;padding:9px 5px;font-size:10px}
+
+/* Search/shop */
+.shop-toolbar{background:var(--surface);border:1px solid var(--border);padding:12px;border-radius:9px;display:flex;gap:9px;align-items:center;margin:18px 0}
+.shop-toolbar input,.shop-toolbar select{height:38px;border:1px solid var(--border);border-radius:6px;padding:0 10px;background:var(--surface);color:var(--text);outline:0}.shop-toolbar input{flex:1;min-width:200px}
+.result-count{font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap}
+
+/* Cards / tables / forms */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px;box-shadow:var(--shadow)}
+.two-col{display:grid;grid-template-columns:1.5fr 1fr;gap:16px}.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{margin-bottom:13px}.field label{display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px}.field input,.field select{width:100%;height:40px;border:1px solid var(--border);border-radius:7px;background:var(--surface);color:var(--text);padding:0 11px;outline:0}
+.detail{display:flex;justify-content:space-between;gap:15px;border-bottom:1px solid var(--border);padding:11px 0;font-size:12px}.detail span:first-child{color:var(--muted)}
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}.empty i{margin-bottom:10px}
+.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;font-size:12px}.table th,.table td{padding:12px 9px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}.table th{font-size:9px;text-transform:uppercase;color:var(--muted)}
+
+/* Cart */
+.drawer-overlay,.modal-overlay{position:fixed;inset:0;background:rgba(12,17,27,.52);z-index:3000;display:grid;place-items:center;padding:18px}
+.cart-panel{position:absolute;right:0;top:0;height:100%;width:min(440px,100%);background:var(--surface);display:flex;flex-direction:column;box-shadow:-10px 0 30px rgba(0,0,0,.2)}
+.cart-head{padding:18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}.cart-items{flex:1;overflow:auto;padding:14px}.cart-item{display:flex;gap:11px;border-bottom:1px solid var(--border);padding:12px 0}.cart-item img{width:68px;height:68px;object-fit:cover;border-radius:7px;background:#f1f2f5}.cart-foot{padding:18px;border-top:1px solid var(--border)}
+.modal{background:var(--surface);width:min(610px,100%);max-height:92vh;overflow:auto;border-radius:12px;border:1px solid var(--border)}.modal-head{padding:17px 19px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}.modal-head h3{margin:0;font-size:17px}.modal-body{padding:19px}.modal-foot{border-top:1px solid var(--border);padding:14px 19px;display:flex;justify-content:flex-end;gap:8px}
+.icon-btn{width:38px;height:38px;border:0;background:transparent;color:var(--text);border-radius:7px;display:grid;place-items:center}.icon-btn:hover{background:#f0f2f5}
+.toast-wrap{position:fixed;right:18px;bottom:18px;z-index:6000;display:grid;gap:8px}.toast{background:var(--surface);color:var(--text);border:1px solid var(--border);box-shadow:var(--shadow);padding:12px 15px;border-radius:8px;font-size:12px;min-width:250px}.toast.success{border-left:4px solid var(--success)}.toast.error{border-left:4px solid var(--danger)}
+
+/* Account / direct-login */
+.account-menu{position:absolute;right:25px;top:60px;width:235px;background:var(--surface);border:1px solid var(--border);border-radius:9px;box-shadow:var(--shadow);padding:8px;z-index:2000;color:var(--text)}.account-menu .user-info{padding:10px;border-bottom:1px solid var(--border);margin-bottom:4px}.account-menu button{width:100%;border:0;background:transparent;color:var(--text);padding:10px;text-align:left;border-radius:6px;font-size:12px}.account-menu button:hover{background:#f0f2f5}
+
+/* Responsive desktop + tablet + mobile */
+@media(max-width:1200px){.product-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.header{padding:0 18px;gap:15px}}
+@media(max-width:950px){.product-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.two-col{grid-template-columns:1fr}.header-search{max-width:none}.header{gap:12px}.header-actions .optional{display:none}}
+@media(max-width:700px){
+ .header{height:62px;padding:0 10px;gap:9px}.brand{font-size:17px}.brand small{font-size:7px}.header-search{display:flex;height:38px}.header-actions{gap:0}.header-btn{padding:0 6px}.header-btn span{display:none}
+ .shell{padding:12px 10px}.category-strip{justify-content:flex-start;padding:10px}.category{min-width:82px}.cat-icon{width:40px!important;height:40px!important}
+ .banner{min-height:210px;padding:25px 24px}.banner h1{font-size:26px}.banner p{font-size:12px;max-width:440px}
+ .product-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.product-img{height:180px}.product-body{padding:10px}.product-title{font-size:11px}.product-actions .btn:first-child{display:none}
+ .shop-toolbar{display:grid;grid-template-columns:1fr 1fr}.shop-toolbar input{grid-column:1/-1;min-width:0}.result-count{margin-left:0}
+ .three-col,.form-row{grid-template-columns:1fr}.section-head{align-items:flex-start;gap:10px}.section-head .btn{white-space:nowrap}
+}
+@media(max-width:420px){.header-search{display:none}.header{justify-content:space-between}.product-grid{grid-template-columns:1fr}.product-img{height:250px}.banner{padding:22px}.banner h1{font-size:23px}.shell{padding:10px}.category-strip{border-radius:7px}.modal-overlay{padding:8px}}
+</style>
+</head>
+<body>
+
+<!-- Directly logged-in single demo customer. No registration/login screen. -->
+<div id="app">
+<header class="header">
+  <div class="brand">Northstar Market<small>SMART SHOPPING</small></div>
+  <div class="header-search">
+    <input id="globalSearch" placeholder="Search products, brands and categories">
+    <button onclick="doSearch()"><i data-lucide="search"></i></button>
+  </div>
+  <div class="header-actions">
+    <button class="header-btn optional" onclick="toast('Orders and delivery updates are available in My Orders','success')"><i data-lucide="package"></i><span>Orders</span></button>
+    <button class="header-btn cart-wrap" onclick="openCart()"><i data-lucide="shopping-bag"></i><span>Cart</span><b id="cartCount" class="count">0</b></button>
+    <button class="header-btn" onclick="toggleAccount()"><span id="avatar" class="avatar">KK</span><span id="customerName">Karthik</span><i data-lucide="chevron-down"></i></button>
+  </div>
+  <div id="accountMenu" class="account-menu hidden">
+    <div class="user-info"><b id="menuName">Karthik K</b><div id="menuEmail" style="font-size:10px;color:var(--muted);margin-top:4px"></div></div>
+    <button onclick="navigate('orders');toggleAccount()">My Orders</button>
+    <button onclick="navigate('profile');toggleAccount()">My Profile</button>
+    <button onclick="navigate('wishlist');toggleAccount()">Wishlist</button>
+  </div>
+</header>
+
+<div class="shell">
+  <div class="category-strip">
+    <button class="category" onclick="filterCategory('Electronics')"><div class="cat-icon"><i data-lucide="smartphone"></i></div>Electronics</button>
+    <button class="category" onclick="filterCategory('Fashion')"><div class="cat-icon"><i data-lucide="shirt"></i></div>Fashion</button>
+    <button class="category" onclick="filterCategory('Home')"><div class="cat-icon"><i data-lucide="lamp"></i></div>Home & Living</button>
+    <button class="category" onclick="filterCategory('Beauty')"><div class="cat-icon"><i data-lucide="sparkles"></i></div>Beauty</button>
+    <button class="category" onclick="filterCategory('Travel')"><div class="cat-icon"><i data-lucide="backpack"></i></div>Travel</button>
+    <button class="category" onclick="filterCategory('Grocery')"><div class="cat-icon"><i data-lucide="shopping-basket"></i></div>Grocery</button>
+    <button class="category" onclick="filterCategory('All')"><div class="cat-icon"><i data-lucide="layout-grid"></i></div>All Products</button>
+  </div>
+
+  <main id="main"></main>
+</div>
+</div>
+
+<div id="modalRoot"></div>
+<div id="cartRoot"></div>
+<div id="toastWrap" class="toast-wrap"></div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const money=n=>'₹'+Number(n).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const img=s=>`https://picsum.photos/seed/${s}/700/520`;
+const uid=p=>p+'-'+Date.now().toString(36)+'-'+Math.floor(Math.random()*9999);
+
+const products=[
+{id:1,brand:'Auralis',name:'Noise Cancelling Wireless Headphones',cat:'Electronics',price:7499,old:9999,rating:4.7,reviews:842,stock:24,img:img('ns-headphones'),desc:'Adaptive noise cancellation, 40-hour battery and memory-foam comfort.'},
+{id:2,brand:'PixelPro',name:'UltraView 4K Smart Monitor 27"',cat:'Electronics',price:24999,old:29999,rating:4.6,reviews:311,stock:12,img:img('ns-monitor'),desc:'4K IPS display with USB-C, HDR support and adjustable stand.'},
+{id:3,brand:'Nexa',name:'Everyday Running Shoes',cat:'Fashion',price:3299,old:4999,rating:4.4,reviews:1290,stock:47,img:img('ns-shoes'),desc:'Lightweight running shoes with breathable mesh and responsive cushioning.'},
+{id:4,brand:'LumaHome',name:'Minimal Ceramic Table Lamp',cat:'Home',price:1899,old:2499,rating:4.5,reviews:408,stock:31,img:img('ns-lamp'),desc:'Warm ambient light with a clean ceramic finish.'},
+{id:5,brand:'KeyForge',name:'Mechanical Keyboard RGB 75%',cat:'Electronics',price:6199,old:7999,rating:4.8,reviews:621,stock:18,img:img('ns-keyboard'),desc:'Hot-swappable switches and compact 75% layout.'},
+{id:6,brand:'UrbanWeave',name:'Premium Cotton Overshirt',cat:'Fashion',price:2199,old:2999,rating:4.3,reviews:286,stock:65,img:img('ns-overshirt'),desc:'Relaxed-fit cotton overshirt for everyday layering.'},
+{id:7,brand:'BrewCraft',name:'Stainless Steel Coffee Maker',cat:'Home',price:4499,old:5499,rating:4.6,reviews:517,stock:22,img:img('ns-coffee'),desc:'Programmable coffee maker with thermal carafe.'},
+{id:8,brand:'FitPulse',name:'Smart Fitness Watch Pro',cat:'Electronics',price:8999,old:11999,rating:4.5,reviews:934,stock:15,img:img('ns-watch'),desc:'AMOLED fitness watch with GPS and sleep tracking.'},
+{id:9,brand:'CasaLiving',name:'Soft Weave Area Rug 5x7',cat:'Home',price:3999,old:5999,rating:4.2,reviews:174,stock:28,img:img('ns-rug'),desc:'Soft low-pile rug with a neutral geometric pattern.'},
+{id:10,brand:'Nova',name:'Portable Bluetooth Speaker',cat:'Electronics',price:2799,old:3499,rating:4.6,reviews:731,stock:39,img:img('ns-speaker'),desc:'Compact waterproof speaker with up to 18 hours playback.'},
+{id:11,brand:'DermaPure',name:'Daily Skincare Essentials Kit',cat:'Beauty',price:1599,old:2199,rating:4.4,reviews:563,stock:55,img:img('ns-beauty'),desc:'Cleanser, moisturizer and SPF daily skincare routine.'},
+{id:12,brand:'TrailPeak',name:'Travel Backpack 28L',cat:'Travel',price:2899,old:3999,rating:4.7,reviews:695,stock:33,img:img('ns-backpack'),desc:'Durable backpack with laptop sleeve and luggage strap.'},
+{id:13,brand:'HomeChef',name:'Digital Air Fryer 5L',cat:'Home',price:5499,old:6999,rating:4.5,reviews:812,stock:19,img:img('ns-airfryer'),desc:'Rapid-air cooking with digital presets and timer.'},
+{id:14,brand:'SoundPeak',name:'True Wireless Earbuds',cat:'Electronics',price:2299,old:2999,rating:4.3,reviews:1502,stock:71,img:img('ns-earbuds'),desc:'Low-latency earbuds with dual microphones.'},
+{id:15,brand:'StreetForm',name:'Classic Everyday Hoodie',cat:'Fashion',price:1799,old:2499,rating:4.5,reviews:433,stock:46,img:img('ns-hoodie'),desc:'Mid-weight cotton blend hoodie with soft interior.'}
+];
+
+const state={page:'home',query:'',category:'All',sort:'featured',cart:[],wishlist:[],orders:[],address:{name:'Karthik K',line:'12 Lake View Road',city:'Hyderabad',state:'Telangana',pin:'500047',phone:'+91 90000 48217'},profile:{name:'Karthik K',email:'karthik.demo@northstar.example',phone:'+91 90000 48217',customerId:'NSM-482917'},theme:'light'};
+
+function storageKey(){return 'northstar_market_single_user'}
+function save(){localStorage.setItem(storageKey(),JSON.stringify({cart:state.cart,wishlist:state.wishlist,orders:state.orders,address:state.address,profile:state.profile,theme:state.theme}))}
+function load(){
+ const saved=JSON.parse(localStorage.getItem(storageKey())||'null');
+ if(saved)Object.assign(state,saved);
+ $('#customerName').textContent=state.profile.name.split(' ')[0];
+ $('#menuName').textContent=state.profile.name;
+ $('#menuEmail').textContent=state.profile.email;
+ $('#avatar').textContent=initials(state.profile.name);
+ document.documentElement.dataset.theme=state.theme;
+ render();
+}
+function initials(n){return n.split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase()}
+function navigate(page){state.page=page;state.query='';$('#globalSearch').value='';render();window.scrollTo(0,0)}
+function filterCategory(cat){state.category=cat;state.page='shop';render()}
+function doSearch(){state.query=$('#globalSearch').value.trim();state.page='shop';render()}
+function productCard(p){
+ const wished=state.wishlist.includes(p.id),disc=Math.round((1-p.price/p.old)*100);
+ return `<article class="product">
+  <button class="wish" onclick="toggleWish(${p.id})" title="Wishlist"><i data-lucide="${wished?'heart-off':'heart'}"></i></button>
+  <div class="product-img"><img src="${p.img}" alt="${p.name}" loading="lazy"></div>
+  <div class="product-body">
+   <div class="brand-name">${p.brand}</div>
+   <div class="product-title">${p.name}</div>
+   <div class="stars"><b>★ ${p.rating}</b><span class="reviews">${p.reviews.toLocaleString()} ratings</span></div>
+   <div class="price">${money(p.price)} <span class="old-price">${money(p.old)}</span><span class="discount">${disc}% off</span></div>
+   <div class="stock">✓ ${p.stock<10?'Only '+p.stock+' left':'In stock'} • Free delivery</div>
+   <div class="product-actions"><button class="btn" onclick="viewProduct(${p.id})">View</button><button class="btn btn-primary" onclick="addCart(${p.id})">Add to cart</button></div>
+  </div>
+ </article>`
+}
+function home(){
+ const featured=products.slice(0,10);
+ return `<div class="banner"><div class="banner-content"><h1>Smart picks for everyday life.</h1><p>Explore carefully selected electronics, fashion, home essentials and more — with transparent prices and convenient delivery.</p><button class="btn" onclick="navigate('shop')">Explore products <i data-lucide="arrow-right"></i></button></div></div>
+ <div class="section-head"><div><h2>Recommended for you</h2><p>Popular products from our current collection.</p></div><button class="btn" onclick="navigate('shop')">View all</button></div>
+ <div class="product-grid">${featured.map(productCard).join('')}</div>
+ <div class="section-head"><div><h2>Why shop with us?</h2><p>Simple, transparent and designed for everyday shopping.</p></div></div>
+ <div class="three-col"><div class="panel"><i data-lucide="truck"></i><h3>Reliable delivery</h3><p style="font-size:12px;color:var(--muted)">Track your orders and receive clear delivery updates.</p></div><div class="panel"><i data-lucide="shield-check"></i><h3>Secure checkout</h3><p style="font-size:12px;color:var(--muted)">Your checkout experience is simulated locally for practice.</p></div><div class="panel"><i data-lucide="refresh-cw"></i><h3>Easy order tracking</h3><p style="font-size:12px;color:var(--muted)">Keep your purchases organized in one place.</p></div></div>`
+}
+function shop(){
+ let arr=products.filter(p=>(state.category==='All'||p.cat===state.category)&&(!state.query||`${p.name} ${p.brand} ${p.cat}`.toLowerCase().includes(state.query.toLowerCase())));
+ if(state.sort==='low')arr.sort((a,b)=>a.price-b.price);if(state.sort==='high')arr.sort((a,b)=>b.price-a.price);if(state.sort==='rating')arr.sort((a,b)=>b.rating-a.rating);
+ return `<div class="section-head"><div><h2>${state.category==='All'?'All products':state.category}</h2><p>${arr.length} products available${state.query?' for “'+state.query+'”':''}</p></div></div>
+ <div class="shop-toolbar"><input id="shopQuery" value="${state.query}" placeholder="Search in products..." onkeydown="if(event.key==='Enter'){state.query=this.value;render()}"><select onchange="state.category=this.value;render()"><option>All</option>${['Electronics','Fashion','Home','Beauty','Travel','Grocery'].map(c=>`<option ${state.category===c?'selected':''}>${c}</option>`).join('')}</select><select onchange="state.sort=this.value;render()"><option value="featured">Featured</option><option value="low" ${state.sort==='low'?'selected':''}>Price: Low to High</option><option value="high" ${state.sort==='high'?'selected':''}>Price: High to Low</option><option value="rating" ${state.sort==='rating'?'selected':''}>Customer Rating</option></select><span class="result-count">${arr.length} results</span></div>
+ <div class="product-grid">${arr.length?arr.map(productCard).join(''):`<div class="panel empty" style="grid-column:1/-1"><i data-lucide="search-x"></i><div>No products match your search.</div><button class="btn" onclick="state.query='';state.category='All';render()" style="margin-top:10px">Clear filters</button></div>`}</div>`
+}
+function wishlist(){
+ const arr=products.filter(p=>state.wishlist.includes(p.id));
+ return `<div class="section-head"><div><h2>My Wishlist</h2><p>${arr.length} saved products</p></div></div><div class="product-grid">${arr.length?arr.map(productCard).join(''):`<div class="panel empty" style="grid-column:1/-1"><i data-lucide="heart"></i><div>Your wishlist is empty.</div><button class="btn btn-primary" onclick="navigate('shop')" style="margin-top:10px">Find products</button></div>`}</div>`
+}
+function orders(){
+ return `<div class="section-head"><div><h2>My Orders</h2><p>${state.orders.length} orders placed from this account</p></div><button class="btn btn-primary" onclick="navigate('shop')">Continue shopping</button></div>${state.orders.length?`<div class="panel table-wrap"><table class="table"><thead><tr><th>Order</th><th>Date</th><th>Items</th><th>Total</th><th>Status</th><th></th></tr></thead><tbody>${state.orders.map(o=>`<tr><td><b>${o.id}</b></td><td>${new Date(o.date).toLocaleDateString('en-IN')}</td><td>${o.items.reduce((s,x)=>s+x.qty,0)}</td><td><b>${money(o.total)}</b></td><td><span style="color:var(--success);font-weight:700">${o.status}</span></td><td><button class="btn" onclick="orderDetails('${o.id}')">View</button></td></tr>`).join('')}</tbody></table></div>`:`<div class="panel empty"><i data-lucide="package"></i><div>No orders yet.</div></div>`}`
+}
+function profile(){
+ return `<div class="section-head"><div><h2>My Profile</h2><p>Your personal customer details.</p></div></div><div class="two-col"><div class="panel"><div style="display:flex;gap:13px;align-items:center;margin-bottom:18px"><div class="avatar" style="width:55px;height:55px">${initials(state.profile.name)}</div><div><h2 style="margin:0">${state.profile.name}</h2><div style="font-size:11px;color:var(--muted)">${state.profile.email}</div></div></div><div class="detail"><span>Customer ID</span><b>${state.profile.customerId}</b></div><div class="detail"><span>Mobile</span><b>${state.profile.phone}</b></div><div class="detail"><span>Account type</span><b>Customer</b></div><button class="btn btn-primary" onclick="editProfile()" style="margin-top:15px">Edit profile</button></div><div class="panel"><h3>Default delivery address</h3><p style="font-size:12px;line-height:1.7">${state.address.name}<br>${state.address.line}<br>${state.address.city}, ${state.address.state} — ${state.address.pin}<br>${state.address.phone}</p><button class="btn" onclick="editAddress()">Edit address</button></div></div>`
+}
+function cartPage(){return `<div class="section-head"><div><h2>Shopping Cart</h2><p>${cartQty()} items</p></div></div>${cartContent()}`}
+function cartContent(){
+ if(!state.cart.length)return `<div class="panel empty"><i data-lucide="shopping-bag"></i><div>Your cart is empty.</div><button class="btn btn-primary" onclick="navigate('shop')" style="margin-top:10px">Start shopping</button></div>`;
+ const sub=subtotal(),delivery=sub>=999?0:79,total=sub+delivery;
+ return `<div class="two-col"><div class="panel">${state.cart.map(x=>{let p=products.find(p=>p.id===x.id);return `<div class="cart-item"><img src="${p.img}"><div style="flex:1"><b style="font-size:12px">${p.name}</b><div style="font-size:11px;color:var(--muted);margin-top:4px">${p.brand}</div><b style="display:block;margin-top:7px">${money(p.price)}</b><div style="display:flex;align-items:center;gap:6px;margin-top:8px"><button class="btn" onclick="qty(${p.id},-1)">−</button><span>${x.qty}</span><button class="btn" onclick="qty(${p.id},1)">+</button><button class="btn" onclick="removeCart(${p.id})">Remove</button></div></div></div>`}).join('')}</div><div class="panel"><h3>Price Details</h3><div class="detail"><span>Product total</span><b>${money(sub)}</b></div><div class="detail"><span>Delivery</span><b>${delivery?'₹79':'FREE'}</b></div><div class="detail"><span>Total amount</span><b style="font-size:18px">${money(total)}</b></div><button class="btn btn-primary" onclick="checkout()" style="width:100%;margin-top:15px">Proceed to checkout</button></div></div>`
+}
+function navigatePage(){
+ const map={home:home,shop:shop,wishlist:wishlist,cart:cartPage,orders:orders,profile:profile};
+ $('#main').innerHTML=(map[state.page]||home)();lucide.createIcons();updateCounts()
+}
+function render(){navigatePage()}
+function subtotal(){return state.cart.reduce((s,x)=>s+x.price*x.qty,0)}
+function cartQty(){return state.cart.reduce((s,x)=>s+x.qty,0)}
+function updateCounts(){$('#cartCount').textContent=cartQty()}
+function addCart(id){let p=products.find(x=>x.id===id),x=state.cart.find(x=>x.id===id);if(x)x.qty++;else state.cart.push({id,qty:1,price:p.price});save();updateCounts();toast(p.name+' added to cart','success')}
+function qty(id,d){let x=state.cart.find(x=>x.id===id);if(!x)return;x.qty+=d;if(x.qty<1)state.cart=state.cart.filter(y=>y.id!==id);save();render()}
+function removeCart(id){state.cart=state.cart.filter(x=>x.id!==id);save();render();toast('Item removed')}
+function toggleWish(id){state.wishlist.includes(id)?state.wishlist=state.wishlist.filter(x=>x!==id):state.wishlist.push(id);save();render();toast(state.wishlist.includes(id)?'Added to wishlist':'Removed from wishlist')}
+function viewProduct(id){
+ const p=products.find(x=>x.id===id),disc=Math.round((1-p.price/p.old)*100);
+ openModal(p.name,`<img src="${p.img}" style="width:100%;height:270px;object-fit:cover;border-radius:8px"><div style="margin-top:15px"><div style="font-size:10px;color:var(--muted);font-weight:800">${p.brand} · ${p.cat}</div><h2 style="margin:6px 0">${p.name}</h2><div class="stars"><b>★ ${p.rating}</b><span class="reviews">${p.reviews.toLocaleString()} ratings</span></div><div class="price">${money(p.price)} <span class="old-price">${money(p.old)}</span><span class="discount">${disc}% off</span></div><p style="font-size:12px;color:var(--muted);line-height:1.6">${p.desc}</p><div class="stock">✓ ${p.stock} units available · Free delivery</div></div>`,`<button class="btn" onclick="closeModal()">Close</button><button class="btn btn-primary" onclick="addCart(${id});closeModal()">Add to cart</button>`)
+}
+function checkout(){
+ if(!state.cart.length)return;
+ const total=subtotal()+(subtotal()>=999?0:79);
+ openModal('Checkout',`<div class="panel" style="background:var(--bg);box-shadow:none"><b>Deliver to</b><p style="font-size:12px;line-height:1.6">${state.address.name}<br>${state.address.line}, ${state.address.city}<br>${state.address.state} — ${state.address.pin}<br>${state.address.phone}</p></div><div class="field"><label>Payment method</label><select id="payment"><option>Demo UPI</option><option>Demo Card</option><option>Cash on Delivery</option></select></div><div class="detail"><span>Items</span><b>${cartQty()}</b></div><div class="detail"><span>Total</span><b>${money(total)}</b></div><p style="font-size:10px;color:var(--muted)">Payment is simulated locally. No real payment is processed.</p>`,`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="placeOrder()">Place order</button>`)
+}
+function placeOrder(){
+ const total=subtotal()+(subtotal()>=999?0:79),o={id:'NSM-'+Math.floor(100000+Math.random()*900000),date:new Date().toISOString(),items:state.cart.map(x=>({...x})),total,status:'Confirmed',payment:$('#payment').value};
+ state.orders.unshift(o);state.cart=[];save();closeModal();render();toast('Order '+o.id+' placed successfully','success')
+}
+function orderDetails(id){
+ const o=state.orders.find(x=>x.id===id);
+ openModal('Order '+o.id,`<div style="display:flex;justify-content:space-between;margin:15px 0"><span><b>Confirmed</b><small style="display:block;color:var(--muted)">Order placed</small></span><span><b>Processing</b><small style="display:block;color:var(--muted)">Preparing</small></span><span><b>Shipping</b><small style="display:block;color:var(--muted)">Upcoming</small></span><span><b>Delivered</b><small style="display:block;color:var(--muted)">Upcoming</small></span></div>${o.items.map(x=>{let p=products.find(p=>p.id===x.id);return `<div class="detail"><span>${p.name} × ${x.qty}</span><b>${money(p.price*x.qty)}</b></div>`}).join('')}<div class="detail"><span>Payment</span><b>${o.payment}</b></div><div class="detail"><span>Order total</span><b>${money(o.total)}</b></div>`)
+}
+function editProfile(){openModal('Edit profile',`<div class="field"><label>Full name</label><input id="newName" value="${state.profile.name}"></div><div class="field"><label>Mobile</label><input id="newPhone" value="${state.profile.phone}"></div>`,`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveProfile()">Save</button>`)}
+function saveProfile(){state.profile.name=$('#newName').value.trim()||state.profile.name;state.profile.phone=$('#newPhone').value.trim()||state.profile.phone;state.address.name=state.profile.name;state.address.phone=state.profile.phone;save();closeModal();load();toast('Profile updated','success')}
+function editAddress(){openModal('Delivery address',`<div class="field"><label>Address</label><input id="newLine" value="${state.address.line}"></div><div class="form-row"><div class="field"><label>City</label><input id="newCity" value="${state.address.city}"></div><div class="field"><label>PIN</label><input id="newPin" value="${state.address.pin}"></div></div>`,`<button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveAddress()">Save</button>`)}
+function saveAddress(){state.address.line=$('#newLine').value;state.address.city=$('#newCity').value;state.address.pin=$('#newPin').value;save();closeModal();render();toast('Address updated','success')}
+function openModal(title,body,foot=''){ $('#modalRoot').innerHTML=`<div class="modal-overlay" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-head"><h3>${title}</h3><button class="icon-btn" onclick="closeModal()"><i data-lucide="x"></i></button></div><div class="modal-body">${body}</div>${foot?`<div class="modal-foot">${foot}</div>`:''}</div></div>`;lucide.createIcons()}
+function closeModal(){$('#modalRoot').innerHTML=''}
+function openCart(){
+ const total=subtotal();
+ $('#cartRoot').innerHTML=`<div class="drawer-overlay" onclick="if(event.target===this)closeCart()"><div class="cart-panel"><div class="cart-head"><b>Cart (${cartQty()})</b><button class="icon-btn" onclick="closeCart()"><i data-lucide="x"></i></button></div><div class="cart-items">${state.cart.length?state.cart.map(x=>{let p=products.find(p=>p.id===x.id);return `<div class="cart-item"><img src="${p.img}"><div style="flex:1"><b style="font-size:12px">${p.name}</b><div style="font-size:11px;color:var(--muted)">${money(p.price)} × ${x.qty}</div><div style="margin-top:8px"><button class="btn" onclick="qty(${p.id},-1);openCart()">−</button> <button class="btn" onclick="qty(${p.id},1);openCart()">+</button></div></div></div>`}).join(''):'<div class="empty">Your cart is empty.</div>'}</div><div class="cart-foot"><div class="detail"><span>Subtotal</span><b>${money(total)}</b></div><button class="btn btn-primary" style="width:100%" onclick="closeCart();navigate('cart')">View cart & checkout</button></div></div></div>`;
+ $('#cartRoot').classList.remove('hidden');lucide.createIcons()
+}
+function closeCart(){$('#cartRoot').innerHTML='';$('#cartRoot').classList.add('hidden')}
+function toggleAccount(){$('#accountMenu').classList.toggle('hidden')}
+function toast(msg,type='success'){const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;$('#toastWrap').appendChild(t);setTimeout(()=>t.remove(),3000)}
+document.addEventListener('click',e=>{if(!e.target.closest('#accountMenu')&&!e.target.closest('#avatar')&&!e.target.closest('.header-btn'))$('#accountMenu').classList.add('hidden')});
+document.addEventListener('DOMContentLoaded',()=>{
+ $('#globalSearch').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch()});
+ load();lucide.createIcons();
+});
+</script>
+</body>
+</html>
