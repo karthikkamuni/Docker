@@ -825,7 +825,7 @@ const money=n=>"₹"+n.toLocaleString("en-IN");
 
 function save(){localStorage.setItem("nexora-cart",JSON.stringify(cart));localStorage.setItem("nexora-wishlist",JSON.stringify(wishlist));updateBadges()}
 function updateBadges(){$("#cartBadge").textContent=cart.reduce((a,x)=>a+x.qty,0);$("#wishBadge").textContent=wishlist.length}
-function stars(r){return `<span class="stars">${"★".repeat(Math.floor(r))}${r%1>=.5?"½":""}</span><span>${r} (${r.toLocaleString("en-IN")})</span>`}
+function stars(r,n){return `<span class="stars">${"★".repeat(Math.floor(r))}${r%1>=.5?"½":""}</span><span>${r} (${(n||0).toLocaleString("en-IN")} reviews)</span>`}
 function getProduct(id){return PRODUCTS.find(p=>p.id===id)}
 
 function renderCategories(){
@@ -864,7 +864,7 @@ function renderProducts(){
       </div>
       <div class="product-info">
         <div class="brand">${p.brand}</div><div class="product-title">${p.name}</div>
-        <div class="rating">${stars(p.rating)}</div>
+        <div class="rating">${stars(p.rating,p.reviews)}</div>
         <div class="price-line"><span class="price">${money(p.price)}</span><span class="mrp">${money(p.mrp)}</span><span class="discount">${p.discount}% off</span></div>
         <div class="delivery"><strong>FREE delivery</strong> · ${p.stock<15?"Only "+p.stock+" left":"Delivery available"}</div>
         <div class="product-actions"><button class="add-cart" data-add="${p.id}">Add to cart</button><button class="buy-now" data-buy="${p.id}">Buy now</button></div>
@@ -897,8 +897,10 @@ function renderCart(){
   $$("#cartBody [data-q]").forEach(b=>b.onclick=()=>changeQty(+b.dataset.q,+b.dataset.d));
   $$("#cartBody [data-remove]").forEach(b=>b.onclick=()=>removeCart(+b.dataset.remove));
   const subtotal=cart.reduce((s,x)=>{const p=getProduct(x.id);return s+p.price*x.qty},0);
-  $("#cartSubtotal").textContent=money(subtotal);$("#cartTotal").textContent=money(subtotal);
-  $("#deliveryFee").textContent=subtotal>=499?"FREE":subtotal?"₹49":"FREE";
+  const delivery=subtotal>=499||!subtotal?0:49;
+  $("#cartSubtotal").textContent=money(subtotal);
+  $("#deliveryFee").textContent=delivery?"₹"+delivery:"FREE";
+  $("#cartTotal").textContent=money(subtotal+delivery);
 }
 function toggleWish(id){
   if(wishlist.includes(id)){wishlist=wishlist.filter(x=>x!==id);toast("Removed from wishlist")}
@@ -909,7 +911,7 @@ function openCart(){renderCart();$("#cartDrawer").classList.add("open");$("#over
 function closeAll(){$$(".drawer").forEach(x=>x.classList.remove("open"));$$(".modal-wrap").forEach(x=>x.classList.remove("show"));$("#overlay").classList.remove("show")}
 function toast(message,type=""){const el=document.createElement("div");el.className="toast "+type;el.innerHTML=message;$("#toastWrap").appendChild(el);setTimeout(()=>el.remove(),2800)}
 function openQuick(id){
-  const p=getProduct(id);quickId=id;$("#quickTitle").textContent=p.name;$("#quickBrand").textContent=`${p.brand} · ${p.category}`;$("#quickImg").src=p.image;$("#quickImg").alt=p.name;$("#quickPrice").textContent=money(p.price);$("#quickRating").innerHTML=stars(p.rating);$("#quickDesc").textContent=p.desc;$("#quickModal").classList.add("show");$("#overlay").classList.add("show")
+  const p=getProduct(id);quickId=id;$("#quickTitle").textContent=p.name;$("#quickBrand").textContent=`${p.brand} · ${p.category}`;$("#quickImg").src=p.image;$("#quickImg").alt=p.name;$("#quickPrice").textContent=money(p.price);$("#quickRating").innerHTML=stars(p.rating,p.reviews);$("#quickDesc").textContent=p.desc;$("#quickModal").classList.add("show");$("#overlay").classList.add("show")
 }
 function openCheckout(){
   if(!cart.length){toast("Your cart is empty","error");return}
@@ -943,7 +945,22 @@ $("#allDeals").onclick=()=>{activeCategory="deals";renderProducts();$("#products
 $("#cartBtn").onclick=openCart;
 $("#checkoutBtn").onclick=openCheckout;
 $("#accountBtn").onclick=()=>{$("#accountModal").classList.add("show");$("#overlay").classList.add("show")};
-$("#wishlistBtn").onclick=()=>{if(!wishlist.length){toast("Your wishlist is empty")}else{activeCategory="all";query="";renderProducts();$("#products").scrollIntoView({behavior:"smooth"});toast(`${wishlist.length} saved product${wishlist.length>1?"s":""} in your wishlist`)}};
+$("#wishlistBtn").onclick=()=>{if(!wishlist.length){toast("Your wishlist is empty")}else{activeCategory="all";activeFilter="all";query="";$("#searchInput").value="";// Temporarily filter to wishlist items only
+const prev=PRODUCTS.filter(p=>wishlist.includes(p.id));$("#productGrid").innerHTML=prev.map(p=>`
+    <article class="product-card">
+      <div class="product-image">
+        <img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.style.display='none'">
+        <span class="product-badge">${p.badge}</span>
+        <button class="wish active" data-wish="${p.id}" aria-label="Wishlist">♥</button>
+      </div>
+      <div class="product-info">
+        <div class="brand">${p.brand}</div><div class="product-title">${p.name}</div>
+        <div class="rating">${stars(p.rating,p.reviews)}</div>
+        <div class="price-line"><span class="price">${money(p.price)}</span><span class="mrp">${money(p.mrp)}</span><span class="discount">${p.discount}% off</span></div>
+        <div class="delivery"><strong>FREE delivery</strong> · ${p.stock<15?"Only "+p.stock+" left":"Delivery available"}</div>
+        <div class="product-actions"><button class="add-cart" data-add="${p.id}">Add to cart</button><button class="buy-now" data-buy="${p.id}">Buy now</button></div>
+      </div>
+    </article>`).join("");$("#resultText").textContent=`${prev.length} saved product${prev.length!==1?"s":""}`;$$("#productGrid [data-add]").forEach(b=>b.onclick=()=>addCart(+b.dataset.add));$$("#productGrid [data-buy]").forEach(b=>b.onclick=()=>{addCart(+b.dataset.buy);openCart()});$$("#productGrid [data-wish]").forEach(b=>b.onclick=()=>toggleWish(+b.dataset.wish));$("#products").scrollIntoView({behavior:"smooth"});toast(`${wishlist.length} saved product${wishlist.length>1?"s":""} in your wishlist`)}};
 $("#quickAdd").onclick=()=>{addCart(quickId);closeAll()};
 $("#quickBuy").onclick=()=>{addCart(quickId);closeAll();openCart()};
 $("#loginBtn").onclick=()=>{toast("Demo sign-in successful");closeAll()};
@@ -1046,9 +1063,11 @@ renderCategories();renderDeals();renderProducts();renderCart();updateBadges();
     `).join('');
   }
 
-  $$('.product-card').forEach(card => {
-    card.addEventListener('click', () => captureProduct(card), {passive:true});
-  });
+  // Use event delegation so dynamically-rendered product cards are also captured
+  document.addEventListener('click', e => {
+    const card = e.target.closest('.product-card');
+    if(card) captureProduct(card);
+  }, {passive:true});
 
   $('#clearRecentBtn')?.addEventListener('click', () => {
     localStorage.removeItem(RECENT_KEY);
